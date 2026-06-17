@@ -17,13 +17,16 @@ from qdrant_client.models import PointStruct
 from chat.embeddings import get_embedding_chat, get_embedding_knowledge
 from langchain_core.tools import tool
 from qdrant_client.http.models import PayloadSchemaType
-
+import streamlit as st
 
 load_dotenv()
 
+QDRANT_URL = os.getenv("QDRANT_URL") or st.secrets["QDRANT_URL"]
+QDRANT_API_KEY = os.getenv("QDRANT_CLOUD_API") or st.secrets["QDRANT_CLOUD_API"]
+
 qdrant = QdrantClient(
-    url=os.getenv("QDRANT_URL"),
-    api_key=os.getenv("QDRANT_CLOUD_API")
+    url=QDRANT_URL,
+    api_key=QDRANT_API_KEY
 )
 
 VECTOR_SIZE = 384

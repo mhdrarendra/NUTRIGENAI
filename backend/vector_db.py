@@ -7,16 +7,15 @@ import sqlite3
 import os
 from dotenv import load_dotenv
 from fastembed import TextEmbedding
+import streamlit as st
 
 # =========================
 # CONFIG
 # =========================
 DB_PATH = r"C:\Users\RENDRA\OneDrive\Documents\STUPEN\projek_nutrigen\backend\nutrition.db"
 
-QDRANT_URL = os.getenv("QDRANT_URL")
-QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
-print(QDRANT_API_KEY)
-print(QDRANT_URL)
+QDRANT_URL = os.getenv("QDRANT_URL") or st.secrets["QDRANT_URL"]
+QDRANT_API_KEY = os.getenv("QDRANT_API_KEY") or st.secrets["QDRANT_API_KEY"]
 
 client = QdrantClient(
     url=QDRANT_URL,

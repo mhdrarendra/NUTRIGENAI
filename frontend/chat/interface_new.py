@@ -5,13 +5,15 @@ from langchain_groq import ChatGroq
 from chat.qdrant_manage_new import save_chat, retrieve_chat_memory, retrieve_knowledge
 from langchain.agents import create_agent
 from chat.tools import target_weight, calculate_bmi
+import streamlit as st
 
 load_dotenv()
 
+GROQ_API_KEY= st.secrets["GROQ_API_KEY"]
 # init LLM (sekali saja)
 client = ChatGroq(
     model="openai/gpt-oss-120b",
-    api_key=os.getenv("GROQ_API"),
+    api_key=GROQ_API_KEY,
     temperature=0
 )
 
