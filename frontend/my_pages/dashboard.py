@@ -10,23 +10,31 @@ st.set_page_config(layout="wide")
 
 
 def load_data():
-    base_dir = os.path.dirname(os.getcwd())
 
-    st.write("cwd =", os.getcwd())
-    st.write("base_dir =", base_dir)
+    current_dir = os.path.dirname(__file__)
 
-    path = os.path.join(
-        base_dir,
-        "backend",
-        "data",
-        "nutrition_clean.csv"
+    path = os.path.abspath(
+        os.path.join(
+            current_dir,
+            "..",
+            "..",
+            "backend",
+            "data",
+            "nutrition_clean.csv"
+        )
     )
 
+    st.write("current_dir =", current_dir)
     st.write("path =", path)
     st.write("exists =", os.path.exists(path))
 
     if os.path.exists(path):
-        return pd.read_csv(path)
+        df = pd.read_csv(path)
+
+        st.write("shape =", df.shape)
+        st.write("columns =", list(df.columns))
+
+        return df
 
     return pd.DataFrame()
 
