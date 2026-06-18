@@ -1,25 +1,49 @@
 import streamlit as st
 import requests
+from backend.services.prediction_service import predict_health
 
 # =========================
 # 🧠 REKOMENDASI ENGINE
 # =========================
-def get_rekomendasi(risiko, bmi):
+def get_rekomendasi(bmi):
     rec = []
 
-    if risiko == 0:
+    # =========================
+    # KURUS
+    # =========================
+    if bmi < 18.5:
+        rec.append("Tingkatkan asupan kalori sehat (karbohidrat kompleks & protein)")
+        rec.append("Perbanyak frekuensi makan (3–5 kali sehari)")
+        rec.append("Konsumsi makanan tinggi protein seperti telur, ayam, ikan")
+        rec.append("Lakukan latihan kekuatan (strength training) ringan")
+        rec.append("Periksa kondisi kesehatan jika berat sulit naik")
+
+    # =========================
+    # NORMAL
+    # =========================
+    elif bmi < 25:
         rec.append("Pertahankan aktivitas fisik secara rutin")
         rec.append("Pertahankan pola tidur 7–8 jam per hari")
         rec.append("Jaga pola makan seimbang")
         rec.append("Perbanyak konsumsi sayur dan buah")
-    else:
-        rec.append("Kurangi makanan cepat saji")
-        rec.append("Rutin olahraga minimal 3–4 kali seminggu")
-        rec.append("Perbaiki pola tidur")
-        rec.append("Kurangi makanan tinggi lemak dan gula")
 
-    # tambahan berdasarkan BMI
-    if bmi >= 25:
+    # =========================
+    # OVERWEIGHT
+    # =========================
+    elif bmi < 30:
+        rec.append("Kurangi makanan tinggi kalori dan gula")
+        rec.append("Rutin olahraga 3–4 kali seminggu")
+        rec.append("Kurangi konsumsi fast food")
+        rec.append("Perbanyak air putih dan sayur")
+
+    # =========================
+    # OBESITAS
+    # =========================
+    else:
+        rec.append("Kurangi makanan cepat saji secara signifikan")
+        rec.append("Rutin olahraga minimal 4–5 kali seminggu")
+        rec.append("Perbaiki pola tidur")
+        rec.append("Konsultasi ke tenaga kesehatan")
         rec.append("Turunkan berat badan secara bertahap")
 
     return rec
@@ -62,21 +86,22 @@ def show():
 
     # ================= PREDIKSI =================
     if st.button("Prediksi"):
+        bmi = berat / ((tinggi / 100) ** 2)
 
         with st.spinner("🔍 Menganalisis kesehatan..."):
-            res = requests.post(
-                "http://127.0.0.1:8000/predict/",
-                json={"umur": umur, "bmi": 0}
-            )
 
-        hasil = res.json()
+            hasil = predict_health({
+                "umur": umur,
+                "bmi": bmi,
+                "tidur": tidur,
+                "fast_food": fast_food,
+                "aktivitas": aktivitas,
+                "riwayat": riwayat
+            })
 
         if "error" in hasil:
             st.error(hasil["error"])
             return
-
-        # ================= HITUNG BMI =================
-        bmi = berat / ((tinggi / 100) ** 2)
 
         if bmi < 18.5:
             kategori = "Kurus"
@@ -87,9 +112,18 @@ def show():
         else:
             kategori = "Obesitas"
 
-        risiko_text = "Rendah" if hasil["risiko"] == 0 else "Tinggi"
+        if bmi < 18.5:
+            risiko_text = "Sangat Rendah"
+        elif bmi < 25:
+            risiko_text = "Rendah/Aman"
+        elif bmi < 30:
+            risiko_text = "Sedang/Waspada"
+        elif bmi < 35:
+            risiko_text = "Tinggi/Resiko"
+        else:
+            risiko_text = "Sangat Tinggi/Bahaya"
 
-        rekomendasi = get_rekomendasi(hasil["risiko"], bmi)
+        rekomendasi = get_rekomendasi(bmi)
 
         # ================= OUTPUT =================
         st.subheader("📊 Hasil Analisis Kesehatan")

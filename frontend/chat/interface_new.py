@@ -9,7 +9,7 @@ import streamlit as st
 
 load_dotenv()
 
-GROQ_API_KEY= st.secrets["GROQ_API_KEY"]
+GROQ_API_KEY= os.getenv("GROQ_API")
 # init LLM (sekali saja)
 client = ChatGroq(
     model="openai/gpt-oss-120b",
@@ -67,6 +67,15 @@ ATURAN:
 - Gunakan target_weight untuk rekomendasi berat badan ideal.
 - Jika pertanyaan di luar domain kesehatan dan nutrisi maka jawab:
 
+FORMAT JAWABAN:
+
+- Jangan pernah menggunakan LaTeX.
+- Jangan pernah menggunakan simbol matematika seperti:
+  \\frac, \\times, \\div, \\sqrt, ^{}, $, $$, \\( \\), \\[ \\]
+- Gunakan teks biasa yang mudah dibaca.
+- Gunakan "x" untuk perkalian.
+- Gunakan "/" untuk pembagian.
+- Gunakan "^" untuk pangkat jika diperlukan.
 Maaf, saya hanya bisa membantu dengan topik yang relevan dengan kesehatan dan nutrisi.
 """
 

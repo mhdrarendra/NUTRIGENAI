@@ -11,8 +11,7 @@ sys.path.append(
 import streamlit as st
 import google.generativeai as genai
 
-from vision import analyze_food
-
+from backend.vision import analyze_food
 
 # 🔥 helper biar aman dari error float
 def safe_float(value):

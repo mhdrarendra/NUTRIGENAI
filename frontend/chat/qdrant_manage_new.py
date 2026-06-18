@@ -18,16 +18,23 @@ from chat.embeddings import get_embedding_chat, get_embedding_knowledge
 from langchain_core.tools import tool
 from qdrant_client.http.models import PayloadSchemaType
 import streamlit as st
+from pathlib import Path
 
 load_dotenv()
 
-QDRANT_URL = os.getenv("QDRANT_URL") or st.secrets["QDRANT_URL"]
-QDRANT_API_KEY = os.getenv("QDRANT_CLOUD_API") or st.secrets["QDRANT_CLOUD_API"]
+qdranturl=os.getenv("QDRANT_URL")
+qdrantapi= os.getenv("QDRANT_CLOUD_API")
+print(qdrantapi)
+print(qdranturl)
+print("URL:", qdranturl)
+print("KEY:", qdrantapi[:20])
 
 qdrant = QdrantClient(
-    url=QDRANT_URL,
-    api_key=QDRANT_API_KEY
+    url=qdranturl,
+    api_key=qdrantapi,
 )
+
+print(qdrant)
 
 VECTOR_SIZE = 384
 
@@ -208,6 +215,5 @@ def retrieve_knowledge(query, collection_name="knowledge_base", limit=5):
 
     return docs
 
-print(qdrant.get_collections())
 ensure_indexes(qdrant)
 print("Collection siap")

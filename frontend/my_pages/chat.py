@@ -38,10 +38,13 @@ def show():
         with st.chat_message("user"):
             st.write(user_input)
 
-        answer, session_id = chat_ai(
-            user_input,
-            st.session_state.session_id
-        )
+        with st.spinner("🧠 NutriGen sedang berpikir keras..."):
+            answer, session_id = chat_ai(
+                user_input,
+                st.session_state.session_id
+            )
+
+        st.session_state.session_id = session_id
 
         st.session_state.session_id = session_id
 

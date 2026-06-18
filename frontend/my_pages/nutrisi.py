@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+from backend.services.nutrition_service import get_nutrition_data
 
 # ==============================
 # 🎨 STYLE GAMBAR + CARD
@@ -100,8 +101,7 @@ def show():
 
         with st.spinner("🔍 Mencari makanan..."):
             try:
-                res = requests.get(f"http://127.0.0.1:8000/nutrition/{food}")
-                data = res.json()
+                data = get_nutrition_data(food)
             except:
                 st.error("❌ Gagal koneksi ke server")
                 return
@@ -131,6 +131,25 @@ def show():
         elif filter_option == "Tinggi Protein":
             filtered_data = [d for d in data if d.get("proteins", 0) > 10]
 
+                # Jika tidak ada hasil setelah filter
+        if not filtered_data:
+
+            if filter_option == "Rendah Kalori":
+                st.warning(
+                    "⚠️ Maaf, makanan tersebut tidak masuk kategori rendah kalori (< 200 kalori)."
+                )
+
+            elif filter_option == "Tinggi Protein":
+                st.warning(
+                    "⚠️ Maaf, makanan tersebut tidak masuk kategori tinggi protein (> 10 gram protein)."
+                )
+
+            else:
+                st.warning(
+                    "⚠️ Maaf, makanan tersebut tidak sesuai dengan filter yang dipilih."
+                )
+
+            return
         # ==============================
         # 🧱 TAMPILAN CARD UI (NEW)
         # ==============================
@@ -153,10 +172,11 @@ def show():
                 # INFO (CUSTOM TEXT, LEBIH KECIL)
                 st.markdown(f"""
                 <div class="food-info">
-                    🍗 Kalori: <b>{item.get('calories', 0)} kcal</b><br>
+                    🔥 Kalori: <b>{item.get('calories', 0)} kalori</b><br>
                     💪 Protein: <b>{item.get('proteins', 0)} g</b><br>
                     🥑 Lemak: <b>{item.get('fat', 0)} g</b><br>
-                    🍞 Karbo: <b>{item.get('carbohydrate', 0)} g</b>
+                    🍞 Karbohidrat: <b>{item.get('carbohydrate', 0)} g</b><br>
+                    ⚖️ Takaran saji: <b>100 gram</b>
                 </div>
                 """, unsafe_allow_html=True)
 
