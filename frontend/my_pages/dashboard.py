@@ -11,8 +11,19 @@ st.set_page_config(layout="wide")
 
 def load_data():
     base_dir = os.path.dirname(os.getcwd())
-    print(base_dir)
-    path = os.path.join(base_dir, "nutrigen_projek", "backend", "data", "nutrition_clean.csv")
+
+    st.write("cwd =", os.getcwd())
+    st.write("base_dir =", base_dir)
+
+    path = os.path.join(
+        base_dir,
+        "backend",
+        "data",
+        "nutrition_clean.csv"
+    )
+
+    st.write("path =", path)
+    st.write("exists =", os.path.exists(path))
 
     if os.path.exists(path):
         return pd.read_csv(path)
@@ -133,6 +144,8 @@ def show():
     # 🍗 CALORIES (BLUE GRADIENT)
     # =========================
     with col1:
+        st.write(df.shape)
+        st.write(df.columns.tolist())
         top_calories = df.sort_values("calories", ascending=True).tail(10)
 
         fig1 = px.bar(
