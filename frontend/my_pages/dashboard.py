@@ -24,16 +24,8 @@ def load_data():
         )
     )
 
-    st.write("current_dir =", current_dir)
-    st.write("path =", path)
-    st.write("exists =", os.path.exists(path))
-
     if os.path.exists(path):
         df = pd.read_csv(path)
-
-        st.write("shape =", df.shape)
-        st.write("columns =", list(df.columns))
-
         return df
 
     return pd.DataFrame()
@@ -152,8 +144,6 @@ def show():
     # 🍗 CALORIES (BLUE GRADIENT)
     # =========================
     with col1:
-        st.write(df.shape)
-        st.write(df.columns.tolist())
         top_calories = df.sort_values("calories", ascending=True).tail(10)
 
         fig1 = px.bar(
