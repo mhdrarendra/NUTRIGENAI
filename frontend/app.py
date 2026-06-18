@@ -71,22 +71,7 @@ st.markdown("""
 
 /* ❌ Hapus header default Streamlit */
 header[data-testid="stHeader"] {
-    display: none;
-}
-
-/* ❌ Hapus menu kanan atas (Deploy, dll) */
-#MainMenu {
-    visibility: hidden;
-}
-
-/* ❌ Optional: footer */
-footer {
-    visibility: hidden;
-}
-
-/* 🔥 Hilangin padding atas biar mepet */
-.block-container {
-    padding-top: 1rem !important;
+    display: transparent;
 }
 
 </style>
