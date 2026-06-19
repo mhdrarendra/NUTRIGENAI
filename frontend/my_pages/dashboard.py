@@ -47,10 +47,10 @@ def show():
     avg_carb = 0
 
     if not df.empty:
-        avg_calories = round(df["calories"].mean(), 2)
-        avg_protein = round(df["proteins"].mean(), 2)
-        avg_fat = round(df["fat"].mean(), 2)
-        avg_carb = round(df["carbohydrate"].mean(), 2)
+        avg_calories = round(df["calories"].mean(), 1)
+        avg_protein = round(df["proteins"].mean(), 1)
+        avg_fat = round(df["fat"].mean(), 1)
+        avg_carb = round(df["carbohydrate"].mean(), 1)
 
     # ==============================
     # 🎨 STYLE
@@ -74,13 +74,13 @@ def show():
 
     /* 🔥 BOLD TITLE */
     .title {
-        font-size: 18px;
+        font-size: 13px;
         margin-bottom: 10px;
         font-weight: bold;
     }
 
     .value {
-        font-size: 30px;
+        font-size: 20px;
         font-weight: bold;
     }
     </style>
