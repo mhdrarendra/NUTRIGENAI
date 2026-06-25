@@ -92,11 +92,12 @@ def show():
 
             hasil = predict_health({
                 "umur": umur,
-                "bmi": bmi,
-                "tidur": tidur,
-                "fast_food": fast_food,
+                "gender": gender,
+                "tinggi": tinggi,
+                "berat": berat,
                 "aktivitas": aktivitas,
-                "riwayat": riwayat
+                "riwayat": riwayat,
+                "fast_food": fast_food
             })
 
         if "error" in hasil:
@@ -143,7 +144,13 @@ def show():
 
 ### 🧮 BMI : {bmi:.1f} ({kategori})
 
-### ⚠️ Prediksi Risiko Kesehatan : {risiko_text}
+### ⚠️ Hasil Prediksi
+
+Kategori Obesitas : {hasil["prediction"]}
+
+Resiko Kesehatan : {risiko_text}
+
+Confidence : {hasil["probability"]*100:.2f}%
 """)
 
         # ================= REKOMENDASI (FIXED) =================

@@ -1,47 +1,107 @@
 import os
 import pickle
+import pandas as pd
 
 # =========================
 # LOAD MODEL
 # =========================
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-model_path = os.path.join(BASE_DIR, "model", "health_model.pkl")
 
-with open(model_path, "rb") as f:
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+MODEL_PATH = os.path.join(
+    BASE_DIR,
+    "model",
+    "obesity_logistic_regression.pkl"
+)
+
+with open(MODEL_PATH, "rb") as f:
     model = pickle.load(f)
 
 
 # =========================
-# PREDICTION FUNCTION
+# PREDICT
 # =========================
+
 def predict_health(data):
     try:
+
+        # =====================
+        # MAPPING INPUT STREAMLIT
+        # =====================
+
         age = data["umur"]
-        bmi = data["bmi"]
-        sleep = data["tidur"]
-        fast_food = data["fast_food"]
-        activity = data["aktivitas"]
-        family = data["riwayat"]
 
-        # mapping string → numeric
-        fast_food_val = 1 if fast_food in ["Setiap Hari", "3–4 Kali/Minggu"] else 0
-        activity_val = 1 if activity in ["Hampir Setiap Hari", "3–4 Kali/Minggu"] else 0
-        family_val = 1 if family == "Ada" else 0
+        gender = "Male" if data["gender"] == "Laki-laki" else "Female"
 
-        result = model.predict([[
-            age,
-            bmi,
-            sleep,
-            fast_food_val,
-            activity_val,
-            family_val
-        ]])
+        height = data["tinggi"] / 100
+        weight = data["berat"]
+
+        # Aktivitas Fisik → FAF
+        aktivitas_map = {
+            "Jarang": 0,
+            "1–2 Kali/Minggu": 1,
+            "3–4 Kali/Minggu": 2,
+            "Hampir Setiap Hari": 3
+        }
+
+        faf = aktivitas_map.get(data["aktivitas"], 1)
+
+        # Fast Food → FAVC
+        favc = (
+            "yes"
+            if data["fast_food"] != "Tidak Pernah"
+            else "no"
+        )
+
+        # Riwayat keluarga
+        family = (
+            "yes"
+            if data["riwayat"] == "Ada"
+            else "no"
+        )
+
+        # =====================
+        # DATAFRAME INPUT
+        # =====================
+
+        input_df = pd.DataFrame([{
+            "Age": age,
+            "Gender": gender,
+            "Height": height,
+            "Weight": weight,
+
+            # default value
+            "CALC": "Sometimes",
+            "FAVC": favc,
+            "FCVC": 2.5,
+            "NCP": 3,
+            "SCC": "no",
+            "SMOKE": "no",
+            "CH2O": 2,
+
+            "family_history_with_overweight": family,
+
+            "FAF": faf,
+            "TUE": 1,
+
+            "CAEC": "Sometimes",
+            "MTRANS": "Public_Transportation"
+        }])
+
+        # =====================
+        # PREDIKSI
+        # =====================
+
+        prediction = model.predict(input_df)[0]
+
+        probabilities = model.predict_proba(input_df)[0]
 
         return {
-            "umur": age,
-            "bmi": bmi,
-            "risiko": int(result[0])
+            "prediction": prediction,
+            "probability": float(max(probabilities))
         }
 
     except Exception as e:
-        return {"error": str(e)}
+        return {
+            "error": str(e)
+        }

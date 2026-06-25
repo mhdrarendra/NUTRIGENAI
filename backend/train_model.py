@@ -1,54 +1,130 @@
 import pandas as pd
-from sklearn.linear_model import LogisticRegression
 import pickle
 import os
 
-# =========================
-# 📊 DATASET LEBIH REALISTIS
-# =========================
-data = {
-    "age": [25,45,35,50,23,40,30,60,28,55],
-    "bmi": [18,30,25,28,21,27,24,32,23,44],
-    "sleep": [8,5,6,5,8,6,7,4,8,5],
-    "fast_food": [0,1,0,1,0,1,0,1,0,1],
-    "activity": [1,0,1,0,1,0,1,0,1,0],
-    "family": [0,1,0,1,0,1,0,1,0,1],
-    "risk": [0,1,0,1,0,1,0,1,0,1]
-}
-
-df = pd.DataFrame(data)
+from sklearn.model_selection import train_test_split
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report
 
 # =========================
-# 🎯 FEATURE & TARGET
+# LOAD DATASET
 # =========================
-X = df[[
-    "age",
-    "bmi",
-    "sleep",
-    "fast_food",
-    "activity",
-    "family"
-]]
 
-y = df["risk"]
+df = pd.read_csv(r"C:\Users\RENDRA\OneDrive\Documents\nutrigen_projek_2_fapi\frontend\chat\obesity.csv")
 
 # =========================
-# 🤖 TRAIN MODEL
+# FEATURE & TARGET
 # =========================
-model = LogisticRegression()
-model.fit(X, y)
-print(model.coef_)
+
+X = df.drop("NObeyesdad", axis=1)
+y = df["NObeyesdad"]
 
 # =========================
-# 💾 SAVE MODEL (FIXED PATH)
+# TRAIN TEST SPLIT
 # =========================
-BASE_DIR = r"C:\Users\RENDRA\OneDrive\Documents\nutrigen_projek\backend"
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42,
+    stratify=y
+)
+
+# =========================
+# NUMERIC FEATURES
+# =========================
+
+numeric_features = [
+    "Age",
+    "Height",
+    "Weight",
+    "FCVC",
+    "NCP",
+    "CH2O",
+    "FAF",
+    "TUE"
+]
+
+# =========================
+# CATEGORICAL FEATURES
+# =========================
+
+categorical_features = [
+    "Gender",
+    "CALC",
+    "FAVC",
+    "SCC",
+    "SMOKE",
+    "family_history_with_overweight",
+    "CAEC",
+    "MTRANS"
+]
+
+# =========================
+# PREPROCESSOR
+# =========================
+
+preprocessor = ColumnTransformer(
+    transformers=[
+        ("num", StandardScaler(), numeric_features),
+        ("cat", OneHotEncoder(handle_unknown="ignore"), categorical_features)
+    ]
+)
+
+# =========================
+# PIPELINE MODEL
+# =========================
+
+model = Pipeline([
+    ("preprocessor", preprocessor),
+    ("classifier", LogisticRegression(
+        max_iter=5000,
+        random_state=42
+    ))
+])
+
+# =========================
+# TRAINING
+# =========================
+
+model.fit(X_train, y_train)
+
+# =========================
+# EVALUASI
+# =========================
+
+y_pred = model.predict(X_test)
+
+print("=" * 50)
+print("ACCURACY")
+print("=" * 50)
+print(accuracy_score(y_test, y_pred))
+
+print("\nCLASSIFICATION REPORT")
+print("=" * 50)
+print(classification_report(y_test, y_pred))
+
+# =========================
+# SAVE MODEL
+# =========================
+
+BASE_DIR = r"C:\Users\RENDRA\OneDrive\Documents\nutrigen_projek_2_fapi\backend"
+
 MODEL_DIR = os.path.join(BASE_DIR, "model")
-MODEL_PATH = os.path.join(MODEL_DIR, "health_model.pkl")
+
+MODEL_PATH = os.path.join(
+    MODEL_DIR,
+    "obesity_logistic_regression.pkl"
+)
 
 os.makedirs(MODEL_DIR, exist_ok=True)
 
 with open(MODEL_PATH, "wb") as f:
     pickle.dump(model, f)
 
-print("Model tersimpan di:", MODEL_PATH)
+print("\nModel berhasil disimpan:")
+print(MODEL_PATH)
